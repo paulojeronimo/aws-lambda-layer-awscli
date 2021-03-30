@@ -100,8 +100,8 @@ include cn.mk
 func-zip:
 	rm -rf ./lambda-bundle; mkdir ./lambda-bundle
 	chmod +x main.sh
-	cp main.sh bootstrap ./lambda-bundle;
-	cp Makefile ./lambda-bundle/Makefile;
+	cp main.sh ./lambda-bundle/handler.sh;
+	cp bootstrap ./lambda-bundle;
 	cd ./lambda-bundle && \
 	zip -r ../func-bundle.zip *; ls -alh ../func-bundle.zip
 	
@@ -128,7 +128,7 @@ layer-all: build layer-upload layer-publish
 
 invoke:
 	@aws --profile=$(AWS_PROFILE) --region $(LAMBDA_REGION) lambda invoke --function-name $(LAMBDA_FUNC_NAME)  \
-	--payload '$(PAYLOAD)' lambda.output --log-type Tail | jq -r .LogResult | base64 -D	
+	--payload '$(PAYLOAD)' lambda.output --cli-binary-format raw-in-base64-out --log-type Tail | jq -r .LogResult | base64 -D
 	
 add-layer-version-permission:
 	@aws --profile=$(AWS_PROFILE) --region $(LAMBDA_REGION) lambda add-layer-version-permission \
